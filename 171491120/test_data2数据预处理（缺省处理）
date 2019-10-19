@@ -1,0 +1,169 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[99]:
+
+
+import pandas as pd
+import numpy as np
+data = pd.read_csv(r"E:\学习资料\人工智能\大数据竞赛\data_format2\test_format2.csv")
+data.head()
+
+
+# In[100]:
+
+
+data.info()
+
+
+# In[101]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[102]:
+
+
+#首先处理年龄缺省值为空的部分
+age_range=data.loc[:,"age_range"].values.reshape(-1,1)
+age_range[:5]
+
+
+# In[103]:
+
+
+from sklearn.impute import SimpleImputer
+imp_0=SimpleImputer(strategy="constant",fill_value=0)
+imp_0=imp_0.fit_transform(age_range)
+imp_0[:5]
+
+
+# In[104]:
+
+
+data.loc[:,"age_range"]=imp_0
+
+
+# In[105]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[106]:
+
+
+#处理值为零的年龄缺省
+imp_mean = SimpleImputer(missing_values=0) #实例化，默认均值填补
+imp_median = SimpleImputer(missing_values=0,strategy="median") #用中位数填补
+imp_mode = SimpleImputer(missing_values=0,strategy="most_frequent") #用众数填补
+
+
+# In[107]:
+
+
+imp_mean=imp_mean.fit_transform(age_range)
+imp_median=imp_median.fit_transform(age_range)
+imp_mode=imp_mode.fit_transform(age_range)
+
+
+# In[108]:
+
+
+imp_mean[5565299:5565304]
+
+
+# In[109]:
+
+
+imp_median[5565299:5565304]
+
+
+# In[110]:
+
+
+imp_mode[5565299:5565304]
+
+
+# In[111]:
+
+
+#经过以上对比，选择中位数填充年龄
+data.loc[:,"age_range"]=imp_median
+
+
+# In[112]:
+
+
+data.info()
+
+
+# In[113]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[114]:
+
+
+#处理性别缺省部分
+gender=data.loc[:,"gender"].values.reshape(-1,1)
+gender[:5]
+
+
+# In[115]:
+
+
+imp_0=SimpleImputer(strategy="constant",fill_value=0)
+
+
+# In[116]:
+
+
+imp_0=imp_0.fit_transform(gender)
+
+
+# In[117]:
+
+
+imp_0[:5]
+
+
+# In[118]:
+
+
+data.loc[:,"gender"]=imp_0
+
+
+# In[119]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[120]:
+
+
+#label是空的代表的是要预测的用户，不用修改
+
+
+# In[128]:
+
+
+#删除activity_log为空的行
+data1=data.dropna(subset=["activity_log"])
+
+
+# In[129]:
+
+
+data1.isnull().sum(axis=0)
+
+
+# In[ ]:
+
+
+
+
