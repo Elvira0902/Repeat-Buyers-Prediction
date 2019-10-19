@@ -1,0 +1,197 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import pandas as pd
+import numpy as np
+data = pd.read_csv(r"E:\学习资料\人工智能\大数据竞赛\data_format2\train_format2.csv")
+data.head()
+
+
+# In[2]:
+
+
+data.info()
+
+
+# In[6]:
+
+
+data.isnull().any(axis=0)
+
+
+# In[9]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[58]:
+
+
+age_range= data.loc[:,"age_range"].values.reshape(-1,1) #sklearn当中特征矩阵必须是二维
+age_range[:10]
+
+
+# In[93]:
+
+
+from sklearn.impute import SimpleImputer
+imp_0=SimpleImputer(strategy="constant",fill_value=0)#把空用0填补空
+
+
+# In[94]:
+
+
+imp_0=imp_0.fit_transform(age_range)
+
+
+# In[103]:
+
+
+imp_0[10000:10005]
+
+
+# In[100]:
+
+
+#在这里我们使用0填补Age中的空
+data.loc[:,"age_range"] = imp_0
+data.info()
+
+
+# In[105]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[109]:
+
+
+#处理年龄缺省部分（为0的人）
+imp_mean = SimpleImputer(missing_values=0) #实例化，默认均值填补
+imp_median = SimpleImputer(missing_values=0,strategy="median") #用中位数填补
+imp_mode=SimpleImputer(missing_values=0,strategy="most_frequent")#用众数填补
+
+
+# In[110]:
+
+
+imp_mean = imp_mean.fit_transform(age_range) #fit_transform一步完成调取结果
+imp_median = imp_median.fit_transform(age_range)
+imp_mode=imp_mode.fit_transform(age_range)
+
+
+# In[112]:
+
+
+imp_mean[40000:40005]
+
+
+# In[113]:
+
+
+imp_median[40000:40005]
+
+
+# In[114]:
+
+
+imp_mode[40000:40005]
+
+
+# In[115]:
+
+
+#经过比较，决定用中位数填补缺省值
+data.loc[:,"age_range"] =imp_median
+data.isnull().sum(axis=0)
+
+
+# In[116]:
+
+
+#年龄的缺省值处理完毕(若数据预测不准确，回来将3,4按比例随机赋值)
+
+
+# In[135]:
+
+
+#处理性别的缺省值
+#查看性别的数据 （女：0，男：1，未知：2或空）
+gender= data.loc[:,"gender"].values.reshape(-1,1) #sklearn当中特征矩阵必须是二维
+gender[:5]
+
+
+# In[124]:
+
+
+#先处理性别的空值
+imp_2=SimpleImputer(strategy="constant",fill_value='2')
+imp_2=imp_2.fit_transform(gender)
+
+
+# In[133]:
+
+
+imp_2[25120:25125]
+
+
+# In[136]:
+
+
+#用2填补所有空
+data.loc[:,"gender"]=imp_2
+
+
+# In[137]:
+
+
+data.isnull().sum(axis=0)
+
+
+# In[139]:
+
+
+#处理性别缺省的人
+imp_mode=SimpleImputer(missing_values=2,strategy = "most_frequent")
+imp_mode=imp_mode.fit_transform(gender)
+imp_mode[25120:25125]
+
+
+# In[140]:
+
+
+#用众数填补性别缺省的人，若数据预测结果不好，按比例，随机赋值男女
+data.loc[:,"gender"] =imp_mode
+data.isnull().sum(axis=0)
+
+
+# In[144]:
+
+
+#活动日志缺省的数据，无法填补，直接删除
+data.dropna(axis=0,inplace=True)
+
+
+# In[145]:
+
+
+#检查是否删除成功
+data.isnull().sum(axis=0)
+
+
+# In[146]:
+
+
+data.info()
+
+
+# In[ ]:
+
+
+
+
